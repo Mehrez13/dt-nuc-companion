@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DT NUC Companion - Version Démo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Application companion pour techniciens CND - DT NUC">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🔧 DT NUC Companion</h1>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot offline"></span>
+                    <span>Hors ligne</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation principale -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="dashboard">
+                📊 Tableau de bord
+            </button>
+            <button class="nav-btn" data-section="procedures">
+                📋 Procédures DT NUC
+            </button>
+            <button class="nav-btn" data-section="checklist">
+                ✅ Check-list
+            </button>
+            <button class="nav-btn" data-section="photos">
+                📸 Photos & Mesures
+            </button>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <!-- Section Tableau de bord -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>🎯 Mission en cours</h3>
+                        <p><strong>Installation:</strong> Réacteur 1 - CPY</p>
+                        <p><strong>Méthode:</strong> Ultrasons (UT)</p>
+                        <p><strong>Équipement:</strong> Générateur vapeur</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <p class="progress-text">65% terminé</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>📚 Procédures disponibles</h3>
+                        <div class="procedure-list">
+                            <div class="procedure-item">DT NUC 001 - UT Générateur</div>
+                            <div class="procedure-item">DT NUC 045 - RT Tuyauterie</div>
+                            <div class="procedure-item">DT NUC 089 - MT Surface</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>⚠️ Alertes & Notifications</h3>
+                        <div class="alert warning">
+                            <strong>Nouvelle version DT NUC 001</strong><br>
+                            Disponible pour synchronisation
+                        </div>
+                        <div class="alert info">
+                            <strong>EPI requis</strong><br>
+                            Gants, casque, chaussures de sécurité
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>📊 Statistiques</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number">24</span>
+                                <span class="stat-label">Contrôles ce mois</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">98%</span>
+                                <span class="stat-label">Conformité</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Procédures -->
+            <section id="procedures" class="content-section">
+                <div class="search-container">
+                    <input type="text" placeholder="🔍 Rechercher une procédure DT NUC..." class="search-input">
+                    <div class="filters">
+                        <select class="filter-select">
+                            <option>Toutes les installations</option>
+                            <option>REP 900 MW</option>
+                            <option>REP 1300 MW</option>
+                            <option>REP 1450 MW</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Toutes les méthodes</option>
+                            <option>Ultrasons (UT)</option>
+                            <option>Radiographie (RT)</option>
+                            <option>Magnétoscopie (MT)</option>
+                            <option>Ressuage (PT)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="procedures-grid">
+                    <div class="procedure-card">
+                        <div class="procedure-header">
+                            <h4>DT NUC 001-V2.3</h4>
+                            <span class="status-badge current">En cours</span>
+                        </div>
+                        <p><strong>Contrôle UT générateur de vapeur</strong></p>
+                        <p>📍 REP 900 MW • 🔧 Ultrasons</p>
+                        <div class="procedure-actions">
+                            <button class="btn-primary">Ouvrir</button>
+                            <button class="btn-secondary">Télécharger</button>
+                        </div>
+                    </div>
+
+                    <div class="procedure-card">
+                        <div class="procedure-header">
+                            <h4>DT NUC 045-V1.8</h4>
+                            <span class="status-badge available">Disponible</span>
+                        </div>
+                        <p><strong>RT sur tuyauterie primaire</strong></p>
+                        <p>📍 REP 1300 MW • 🔧 Radiographie</p>
+                        <div class="procedure-actions">
+                            <button class="btn-primary">Ouvrir</button>
+                            <button class="btn-secondary">Télécharger</button>
+                        </div>
+                    </div>
+
+                    <div class="procedure-card">
+                        <div class="procedure-header">
+                            <h4>DT NUC 089-V3.1</h4>
+                            <span class="status-badge update">MAJ dispo</span>
+                        </div>
+                        <p><strong>MT des surfaces accessibles</strong></p>
+                        <p>📍 Toutes installations • 🔧 Magnétoscopie</p>
+                        <div class="procedure-actions">
+                            <button class="btn-primary">Ouvrir</button>
+                            <button class="btn-warning">Mettre à jour</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Check-list -->
+            <section id="checklist" class="content-section">
+                <div class="checklist-header">
+                    <h3>✅ Check-list DT NUC 001 - Contrôle UT</h3>
+                    <div class="checklist-progress">
+                        <span>5/12 étapes terminées</span>
+                        <div class="mini-progress">
+                            <div class="mini-progress-fill" style="width: 42%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checklist-items">
+                    <div class="checklist-item completed">
+                        <input type="checkbox" checked disabled>
+                        <div class="item-content">
+                            <h4>1. Préparation matériel</h4>
+                            <p>Vérification appareil UT, calibrage, étalons</p>
+                            <span class="timestamp">✅ 14:23</span>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item completed">
+                        <input type="checkbox" checked disabled>
+                        <div class="item-content">
+                            <h4>2. EPI et sécurité</h4>
+                            <p>Port des équipements de protection individuelle</p>
+                            <span class="timestamp">✅ 14:25</span>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item current">
+                        <input type="checkbox">
+                        <div class="item-content">
+                            <h4>3. Contrôle zone A</h4>
+                            <p>Soudures circulaires - épaisseur nominale</p>
+                            <div class="item-actions">
+                                <button class="btn-small">📸 Photo</button>
+                                <button class="btn-small">📝 Mesure</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item">
+                        <input type="checkbox">
+                        <div class="item-content">
+                            <h4>4. Contrôle zone B</h4>
+                            <p>Soudures longitudinales - détection défauts</p>
+                        </div>
+                    </div>
+
+                    <div class="checklist-item">
+                        <input type="checkbox">
+                        <div class="item-content">
+                            <h4>5. Mesures complémentaires</h4>
+                            <p>Relevés selon critères d'acceptation</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Photos & Mesures -->
+            <section id="photos" class="content-section">
+                <div class="media-header">
+                    <h3>📸 Photos & Mesures - Mission actuelle</h3>
+                    <button class="btn-primary">➕ Ajouter</button>
+                </div>
+
+                <div class="media-grid">
+                    <div class="media-item">
+                        <div class="media-thumbnail">
+                            <div class="placeholder-image">📷</div>
+                        </div>
+                        <div class="media-info">
+                            <h4>Soudure A-01</h4>
+                            <p>UT - Épaisseur: 12.3mm</p>
+                            <span class="timestamp">14:45</span>
+                        </div>
+                    </div>
+
+                    <div class="media-item">
+                        <div class="media-thumbnail">
+                            <div class="placeholder-image">📊</div>
+                        </div>
+                        <div class="media-info">
+                            <h4>Graphique UT</h4>
+                            <p>Signal - Zone critique</p>
+                            <span class="timestamp">14:42</span>
+                        </div>
+                    </div>
+
+                    <div class="media-item">
+                        <div class="media-thumbnail">
+                            <div class="placeholder-image">📷</div>
+                        </div>
+                        <div class="media-info">
+                            <h4>Vue générale</h4>
+                            <p>Contexte intervention</p>
+                            <span class="timestamp">14:20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sync-info">
+                    <div class="sync-status">
+                        <span class="sync-icon">⏸️</span>
+                        <span>3 éléments en attente de synchronisation</span>
+                    </div>
+                    <button class="btn-secondary">Synchroniser maintenant</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast notifications -->
+        <div id="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

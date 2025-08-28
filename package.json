@@ -1,0 +1,38 @@
+{
+  "name": "dt-nuc-companion",
+  "version": "1.0.0",
+  "description": "Application companion pour techniciens CND - DT NUC",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s . -l 8080",
+    "start-local": "python3 -m http.server 8080",
+    "build": "echo 'Static site ready for deployment'",
+    "deploy-render": "echo 'Deploy to Render via git push'",
+    "deploy-github": "gh-pages -d .",
+    "test": "echo 'Tests à implémenter'",
+    "lint": "echo 'Linting à implémenter'"
+  },
+  "keywords": [
+    "nuclear",
+    "ndt",
+    "edf",
+    "companion",
+    "offline-first",
+    "pwa"
+  ],
+  "author": "EDF - Équipe DT NUC",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "gh-pages": "^6.0.0",
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/votre-username/dt-nuc-companion.git"
+  },
+  "homepage": "https://dt-nuc-companion.onrender.com"
+}

@@ -1,0 +1,65 @@
+{
+  "name": "DT NUC Companion",
+  "short_name": "DT NUC",
+  "description": "Application companion pour techniciens CND - DT NUC",
+  "version": "1.0.0",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "fr",
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot-narrow.png", 
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvelle check-list",
+      "short_name": "Check-list",
+      "description": "Démarrer une nouvelle check-list",
+      "url": "/?section=checklist",
+      "icons": [{ "src": "icon-checklist.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Procédures",
+      "short_name": "DT NUC",
+      "description": "Accéder aux procédures DT NUC",
+      "url": "/?section=procedures", 
+      "icons": [{ "src": "icon-procedures.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.edf.dtnuc",
+      "id": "com.edf.dtnuc"
+    }
+  ],
+  "prefer_related_applications": false
+}
