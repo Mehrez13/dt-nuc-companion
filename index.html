@@ -91,68 +91,168 @@
                 </div>
             </section>
 
-            <!-- Section Procédures -->
-            <section id="procedures" class="content-section">
-                <div class="search-container">
-                    <input type="text" placeholder="🔍 Rechercher une procédure DT NUC..." class="search-input">
-                    <div class="filters">
-                        <select class="filter-select">
-                            <option>Toutes les installations</option>
-                            <option>REP 900 MW</option>
-                            <option>REP 1300 MW</option>
-                            <option>REP 1450 MW</option>
-                        </select>
-                        <select class="filter-select">
-                            <option>Toutes les méthodes</option>
-                            <option>Ultrasons (UT)</option>
-                            <option>Radiographie (RT)</option>
-                            <option>Magnétoscopie (MT)</option>
-                            <option>Ressuage (PT)</option>
-                        </select>
-                    </div>
-                </div>
+              <!-- Section Procédures Avancée -->
+              <section id="procedures" class="content-section">
+                  <div class="procedures-header">
+                      <h3>📋 Gestionnaire de Procédures DT NUC</h3>
+                      <div class="procedures-actions">
+                          <button class="btn-primary" id="uploadProcedureBtn">➕ Upload Procédure</button>
+                          <button class="btn-secondary" id="viewStatsBtn">📊 Statistiques</button>
+                      </div>
+                  </div>
+            
+                  <div class="search-container-advanced">
+                      <div class="search-row">
+                          <input type="text" id="advancedSearch" placeholder="🔍 Recherche avancée (code, titre, contenu...)" class="search-input-advanced">
+                          <button class="btn-secondary" id="searchBtn">Rechercher</button>
+                      </div>
+            
+                      <div class="filters-row">
+                          <select class="filter-select" id="installationFilter">
+                              <option value="">Toutes les installations</option>
+                              <option value="REP 900 MW">REP 900 MW</option>
+                              <option value="REP 1300 MW">REP 1300 MW</option>
+                              <option value="REP 1450 MW">REP 1450 MW</option>
+                              <option value="Toutes installations">Toutes installations</option>
+                          </select>
+            
+                          <select class="filter-select" id="methodFilter">
+                              <option value="">Toutes les méthodes</option>
+                              <option value="Ultrasons (UT)">Ultrasons (UT)</option>
+                              <option value="Radiographie (RT)">Radiographie (RT)</option>
+                              <option value="Magnétoscopie (MT)">Magnétoscopie (MT)</option>
+                              <option value="Ressuage (PT)">Ressuage (PT)</option>
+                          </select>
+            
+                          <select class="filter-select" id="statusFilter">
+                              <option value="">Tous les statuts</option>
+                              <option value="current">Actuel</option>
+                              <option value="available">Disponible</option>
+                              <option value="update_available">MAJ disponible</option>
+                              <option value="obsolete">Obsolète</option>
+                          </select>
+                      </div>
+                  </div>
+            
+                  <div class="search-results-info">
+                      <span id="searchResultsCount">Toutes les procédures</span>
+                      <button class="btn-small" id="clearSearchBtn" style="display: none;">✖ Effacer</button>
+                  </div>
+            
+                  <div class="procedures-grid" id="proceduresGrid">
+                      <!-- Les procédures seront chargées dynamiquement -->
+                  </div>
+            
+                  <!-- Statistiques Panel (masqué par défaut) -->
+                  <div id="statsPanel" class="stats-panel" style="display: none;">
+                      <div class="stats-header">
+                          <h4>📊 Statistiques des Procédures</h4>
+                          <button class="btn-small" id="closeStatsBtn">✖</button>
+                      </div>
+                      <div class="stats-content">
+                          <div class="stats-grid">
+                              <div class="stat-card">
+                                  <span class="stat-number" id="totalProcedures">0</span>
+                                  <span class="stat-label">Total Procédures</span>
+                              </div>
+                              <div class="stat-card">
+                                  <span class="stat-number" id="totalSize">0 MB</span>
+                                  <span class="stat-label">Espace utilisé</span>
+                              </div>
+                              <div class="stat-card">
+                                  <span class="stat-number" id="currentProcedures">0</span>
+                                  <span class="stat-label">Procédures actuelles</span>
+                              </div>
+                              <div class="stat-card">
+                                  <span class="stat-number" id="recentUpdates">0</span>
+                                  <span class="stat-label">MAJ cette semaine</span>
+                              </div>
+                          </div>
+            
+                          <div class="charts-container">
+                              <div class="chart-item">
+                                  <h5>Par Installation</h5>
+                                  <div id="installationChart" class="chart-bars"></div>
+                              </div>
+                              <div class="chart-item">
+                                  <h5>Par Méthode</h5>
+                                  <div id="methodChart" class="chart-bars"></div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </section>
+            
+              <!-- Modal Upload Procédure -->
+              <div id="uploadModal" class="modal" style="display: none;">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h4>➕ Upload Nouvelle Procédure</h4>
+                          <button class="btn-small" id="closeUploadBtn">✖</button>
+                      </div>
+                      <form id="uploadForm" class="upload-form">
+                          <div class="form-group">
+                              <label>📁 Fichier PDF:</label>
+                              <input type="file" id="procedureFile" accept=".pdf" required>
+                          </div>
+            
+                          <div class="form-row">
+                              <div class="form-group">
+                                  <label>🔤 Code DT NUC:</label>
+                                  <input type="text" id="procedureCode" placeholder="ex: DT NUC 150" required>
+                              </div>
+                              <div class="form-group">
+                                  <label>🔢 Version:</label>
+                                  <input type="text" id="procedureVersion" placeholder="ex: 1.0" required>
+                              </div>
+                          </div>
+            
+                          <div class="form-group">
+                              <label>📝 Titre:</label>
+                              <input type="text" id="procedureTitle" placeholder="Titre de la procédure" required>
+                          </div>
+            
+                          <div class="form-group">
+                              <label>📄 Description:</label>
+                              <textarea id="procedureDescription" placeholder="Description détaillée..." rows="3"></textarea>
+                          </div>
+            
+                          <div class="form-row">
+                              <div class="form-group">
+                                  <label>🏭 Installation:</label>
+                                  <select id="procedureInstallation" required>
+                                      <option value="">Sélectionner...</option>
+                                      <option value="REP 900 MW">REP 900 MW</option>
+                                      <option value="REP 1300 MW">REP 1300 MW</option>
+                                      <option value="REP 1450 MW">REP 1450 MW</option>
+                                      <option value="Toutes installations">Toutes installations</option>
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label>🔧 Méthode:</label>
+                                  <select id="procedureMethod" required>
+                                      <option value="">Sélectionner...</option>
+                                      <option value="Ultrasons (UT)">Ultrasons (UT)</option>
+                                      <option value="Radiographie (RT)">Radiographie (RT)</option>
+                                      <option value="Magnétoscopie (MT)">Magnétoscopie (MT)</option>
+                                      <option value="Ressuage (PT)">Ressuage (PT)</option>
+                                  </select>
+                              </div>
+                          </div>
+            
+                          <div class="form-group">
+                              <label>🔍 Mots-clés:</label>
+                              <input type="text" id="procedureKeywords" placeholder="soudure, défaut, épaisseur..." >
+                          </div>
+            
+                          <div class="form-actions">
+                              <button type="button" class="btn-secondary" id="cancelUploadBtn">Annuler</button>
+                              <button type="submit" class="btn-primary">📤 Upload Procédure</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
 
-                <div class="procedures-grid">
-                    <div class="procedure-card">
-                        <div class="procedure-header">
-                            <h4>DT NUC 001-V2.3</h4>
-                            <span class="status-badge current">En cours</span>
-                        </div>
-                        <p><strong>Contrôle UT générateur de vapeur</strong></p>
-                        <p>📍 REP 900 MW • 🔧 Ultrasons</p>
-                        <div class="procedure-actions">
-                            <button class="btn-primary">Ouvrir</button>
-                            <button class="btn-secondary">Télécharger</button>
-                        </div>
-                    </div>
-
-                    <div class="procedure-card">
-                        <div class="procedure-header">
-                            <h4>DT NUC 045-V1.8</h4>
-                            <span class="status-badge available">Disponible</span>
-                        </div>
-                        <p><strong>RT sur tuyauterie primaire</strong></p>
-                        <p>📍 REP 1300 MW • 🔧 Radiographie</p>
-                        <div class="procedure-actions">
-                            <button class="btn-primary">Ouvrir</button>
-                            <button class="btn-secondary">Télécharger</button>
-                        </div>
-                    </div>
-
-                    <div class="procedure-card">
-                        <div class="procedure-header">
-                            <h4>DT NUC 089-V3.1</h4>
-                            <span class="status-badge update">MAJ dispo</span>
-                        </div>
-                        <p><strong>MT des surfaces accessibles</strong></p>
-                        <p>📍 Toutes installations • 🔧 Magnétoscopie</p>
-                        <div class="procedure-actions">
-                            <button class="btn-primary">Ouvrir</button>
-                            <button class="btn-warning">Mettre à jour</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- Section Check-list -->
             <section id="checklist" class="content-section">
