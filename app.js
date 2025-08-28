@@ -1,28 +1,31 @@
   // DT NUC Companion - Application JavaScript avec IndexedDB
   class DTNucApp {
       constructor() {
-          this.currentSection = 'dashboard';
-          this.offlineMode = true;
-          this.dbManager = null;
-          this.init();
+      this.currentSection = 'dashboard';
+      this.offlineMode = true;
+      this.dbManager = null;
+      this.swManager = null; // NOUVEAU
+      this.init();
       }
-
+    
       async init() {
           // Initialiser IndexedDB
           this.dbManager = new DatabaseManager();
           const dbInitialized = await this.dbManager.init();
-
+    
           if (dbInitialized) {
               this.showToast('💾 IndexedDB initialisé avec succès', 'success');
               await this.loadDataFromDB();
-          } else {
-              this.showToast('❌ Erreur initialisation base de données', 'error');
           }
-
+    
+          // Initialiser Service Worker - NOUVEAU
+          this.swManager = new ServiceWorkerManager(this);
+    
           this.bindEvents();
           this.updateConnectionStatus();
-          this.showToast('🚀 Application initialisée en mode hors ligne', 'info');
+          this.showToast('🚀 Application avec Service Worker intelligent', 'info');
       }
+
 
       async loadDataFromDB() {
           try {
