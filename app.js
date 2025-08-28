@@ -9,22 +9,26 @@
       }
     
       async init() {
-          // Initialiser IndexedDB
-          this.dbManager = new DatabaseManager();
-          const dbInitialized = await this.dbManager.init();
-    
-          if (dbInitialized) {
-              this.showToast('💾 IndexedDB initialisé avec succès', 'success');
-              await this.loadDataFromDB();
-          }
-    
-          // Initialiser Service Worker - NOUVEAU
-          this.swManager = new ServiceWorkerManager(this);
-    
-          this.bindEvents();
-          this.updateConnectionStatus();
-          this.showToast('🚀 Application avec Service Worker intelligent', 'info');
-      }
+            // Initialiser IndexedDB
+            this.dbManager = new DatabaseManager();
+            const dbInitialized = await this.dbManager.init();
+      
+            if (dbInitialized) {
+                this.showToast('💾 IndexedDB initialisé avec succès', 'success');
+                await this.loadDataFromDB();
+            }
+      
+            // Initialiser ProcedureManager - NOUVEAU
+            this.procedureManager = new ProcedureManager(this.dbManager);
+      
+            // Initialiser Service Worker
+            this.swManager = new ServiceWorkerManager(this);
+      
+            this.bindEvents();
+            this.updateConnectionStatus();
+            this.showToast('🚀 Application avec gestion procédures avancée', 'info');
+        }
+
 
 
       async loadDataFromDB() {
