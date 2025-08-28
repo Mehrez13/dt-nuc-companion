@@ -20,7 +20,12 @@
       "Bash(gtimeout:*)",
       "Bash(npx expo export:web:*)",
       "Bash(npx expo export:*)",
-      "Bash(./scripts/validate-devops-setup.sh:*)"
+      "Bash(./scripts/validate-devops-setup.sh:*)",
+      "mcp__github__get_file_contents",
+      "mcp__github__search_repositories",
+      "WebFetch(domain:dt-nuc-companion.onrender.com)",
+      "mcp__github__create_or_update_file",
+      "mcp__github__push_files"
     ],
     "deny": []
   }
