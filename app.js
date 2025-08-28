@@ -481,6 +481,403 @@
   }
 
 
+  // Gestionnaire Interface Procédures Avancée
+  class ProcedureUI {
+      constructor(app) {
+          this.app = app;
+          this.currentProcedures = [];
+          this.init();
+      }
+
+      init() {
+          this.bindAdvancedEvents();
+          this.loadProceduresGrid();
+      }
+
+      bindAdvancedEvents() {
+          // Bouton Upload
+          document.getElementById('uploadProcedureBtn')?.addEventListener('click', () => {
+              this.showUploadModal();
+          });
+
+          // Bouton Statistiques
+          document.getElementById('viewStatsBtn')?.addEventListener('click', () => {
+              this.showStatsPanel();
+          });
+
+          // Recherche avancée
+          document.getElementById('searchBtn')?.addEventListener('click', () => {
+              this.performAdvancedSearch();
+          });
+
+          document.getElementById('advancedSearch')?.addEventListener('keypress', (e) => {
+              if (e.key === 'Enter') this.performAdvancedSearch();
+          });
+
+          // Filtres
+          ['installationFilter', 'methodFilter', 'statusFilter'].forEach(filterId => {
+              document.getElementById(filterId)?.addEventListener('change', () => {
+                  this.performAdvancedSearch();
+              });
+          });
+
+          // Effacer recherche
+          document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
+              this.clearSearch();
+          });
+
+          // Modal Upload
+          this.bindUploadModalEvents();
+
+          // Stats Panel
+          this.bindStatsPanelEvents();
+      }
+
+      bindUploadModalEvents() {
+          const modal = document.getElementById('uploadModal');
+          const form = document.getElementById('uploadForm');
+
+          // Fermer modal
+          document.getElementById('closeUploadBtn')?.addEventListener('click', () => {
+              this.hideUploadModal();
+          });
+
+          document.getElementById('cancelUploadBtn')?.addEventListener('click', () => {
+              this.hideUploadModal();
+          });
+
+          // Clic en dehors du modal
+          modal?.addEventListener('click', (e) => {
+              if (e.target === modal) this.hideUploadModal();
+          });
+
+          // Submit form
+          form?.addEventListener('submit', (e) => {
+              e.preventDefault();
+              this.handleUploadSubmit();
+          });
+      }
+
+      bindStatsPanelEvents() {
+          document.getElementById('closeStatsBtn')?.addEventListener('click', () => {
+              this.hideStatsPanel();
+          });
+      }
+
+      async loadProceduresGrid() {
+          try {
+              const procedures = await this.app.procedureManager.searchProcedures('', {});
+              this.currentProcedures = procedures;
+              this.renderProceduresGrid(procedures);
+              this.updateResultsCount(procedures.length, 'Toutes les procédures');
+          } catch (error) {
+              console.error('❌ Erreur chargement procédures:', error);
+              this.app.showToast('❌ Erreur chargement procédures', 'error');
+          }
+      }
+
+      renderProceduresGrid(procedures) {
+          const grid = document.getElementById('proceduresGrid');
+          if (!grid) return;
+
+          if (procedures.length === 0) {
+              grid.innerHTML = `
+                  <div class="empty-state">
+                      <h3>📋 Aucune procédure trouvée</h3>
+                      <p>Aucune procédure ne correspond à vos critères de recherche.</p>
+                      <button class="btn-primary" onclick="document.getElementById('uploadProcedureBtn').click()">
+                          ➕ Ajouter une procédure
+                      </button>
+                  </div>
+              `;
+              return;
+          }
+
+          grid.innerHTML = procedures.map(procedure => `
+              <div class="procedure-card enhanced" data-id="${procedure.id}">
+                  <div class="procedure-header">
+                      <h4>${procedure.code}-v${procedure.version}</h4>
+                      <div class="procedure-badges">
+                          <span class="status-badge ${procedure.status}">${this.getStatusLabel(procedure.status)}</span>
+                          ${procedure.viewCount ? `<span class="view-badge">👁️ ${procedure.viewCount}</span>` : ''}
+                      </div>
+                  </div>
+                  
+                  <div class="procedure-info">
+                      <h5>${procedure.title}</h5>
+                      <p class="procedure-description">${procedure.description || 'Aucune description'}</p>
+                      
+                      <div class="procedure-meta">
+                          <span class="meta-item">🏭 ${procedure.installation}</span>
+                          <span class="meta-item">🔧 ${procedure.method}</span>
+                          ${procedure.fileSize ? `<span class="meta-item">📁 ${this.formatFileSize(procedure.fileSize)}</span>` : ''}
+                      </div>
+                      
+                      <div class="procedure-timestamps">
+                          <small>📅 Mis à jour: ${this.formatDate(procedure.lastUpdated)}</small>
+                          ${procedure.lastViewed ? `<small>👁️ Consulté: ${this.formatDate(procedure.lastViewed)}</small>` : ''}
+                      </div>
+                  </div>
+
+                  <div class="procedure-actions">
+                      <button class="btn-primary" onclick="app.procedureUI.openProcedure(${procedure.id})">
+                          📖 Ouvrir
+                      </button>
+                      <button class="btn-secondary" onclick="app.procedureUI.downloadProcedure(${procedure.id})">
+                          📥 Télécharger
+                      </button>
+                      <button class="btn-small" onclick="app.procedureUI.showProcedureMenu(${procedure.id})" title="Plus d'options">
+                          ⋮
+                      </button>
+                  </div>
+
+                  ${procedure.annotations && procedure.annotations.length > 0 ? `
+                      <div class="annotations-preview">
+                          📝 ${procedure.annotations.length} annotation(s)
+                      </div>
+                  ` : ''}
+              </div>
+          `).join('');
+
+          // Ajouter animations
+          const cards = grid.querySelectorAll('.procedure-card');
+          cards.forEach((card, index) => {
+              card.style.animation = `slideInUp 0.3s ease ${index * 0.1}s both`;
+          });
+      }
+
+      async performAdvancedSearch() {
+          try {
+              const query = document.getElementById('advancedSearch')?.value || '';
+              const filters = {
+                  installation: document.getElementById('installationFilter')?.value,
+                  method: document.getElementById('methodFilter')?.value,
+                  status: document.getElementById('statusFilter')?.value
+              };
+
+              const procedures = await this.app.procedureManager.searchProcedures(query, filters);
+              this.currentProcedures = procedures;
+              this.renderProceduresGrid(procedures);
+
+              // Mettre à jour l'info de résultats
+              const searchInfo = query ? `Recherche: "${query}"` : 'Filtres appliqués';
+              this.updateResultsCount(procedures.length, searchInfo);
+
+              // Afficher bouton effacer si recherche active
+              const clearBtn = document.getElementById('clearSearchBtn');
+              if (clearBtn) {
+                  clearBtn.style.display = (query || filters.installation || filters.method || filters.status) ? 'block' : 'none';
+              }
+
+              this.app.showToast(`🔍 ${procedures.length} procédure(s) trouvée(s)`, 'info');
+
+          } catch (error) {
+              console.error('❌ Erreur recherche:', error);
+              this.app.showToast('❌ Erreur lors de la recherche', 'error');
+          }
+      }
+
+      clearSearch() {
+          // Effacer les champs
+          const searchInput = document.getElementById('advancedSearch');
+          if (searchInput) searchInput.value = '';
+
+          ['installationFilter', 'methodFilter', 'statusFilter'].forEach(filterId => {
+              const filter = document.getElementById(filterId);
+              if (filter) filter.value = '';
+          });
+
+          // Masquer bouton effacer
+          const clearBtn = document.getElementById('clearSearchBtn');
+          if (clearBtn) clearBtn.style.display = 'none';
+
+          // Recharger toutes les procédures
+          this.loadProceduresGrid();
+          this.app.showToast('🔄 Recherche effacée', 'info');
+      }
+
+      updateResultsCount(count, description) {
+          const resultsInfo = document.getElementById('searchResultsCount');
+          if (resultsInfo) {
+              resultsInfo.textContent = `${count} procédure(s) • ${description}`;
+          }
+      }
+
+      showUploadModal() {
+          const modal = document.getElementById('uploadModal');
+          if (modal) {
+              modal.style.display = 'flex';
+              modal.style.animation = 'fadeIn 0.3s ease';
+          }
+      }
+
+      hideUploadModal() {
+          const modal = document.getElementById('uploadModal');
+          if (modal) {
+              modal.style.animation = 'fadeOut 0.3s ease';
+              setTimeout(() => {
+                  modal.style.display = 'none';
+                  this.resetUploadForm();
+              }, 300);
+          }
+      }
+
+      resetUploadForm() {
+          const form = document.getElementById('uploadForm');
+          if (form) form.reset();
+      }
+
+      async handleUploadSubmit() {
+          try {
+              const fileInput = document.getElementById('procedureFile');
+              const file = fileInput?.files[0];
+
+              if (!file) {
+                  this.app.showToast('❌ Veuillez sélectionner un fichier', 'error');
+                  return;
+              }
+
+              const metadata = {
+                  code: document.getElementById('procedureCode')?.value,
+                  version: document.getElementById('procedureVersion')?.value,
+                  title: document.getElementById('procedureTitle')?.value,
+                  description: document.getElementById('procedureDescription')?.value,
+                  installation: document.getElementById('procedureInstallation')?.value,
+                  method: document.getElementById('procedureMethod')?.value,
+                  keywords: document.getElementById('procedureKeywords')?.value
+              };
+
+              this.app.showToast('📤 Upload en cours...', 'info');
+
+              const procedureId = await this.app.procedureManager.uploadProcedure(file, metadata);
+
+              this.app.showToast(`✅ Procédure ${metadata.code} uploadée avec succès`, 'success');
+              this.hideUploadModal();
+              await this.loadProceduresGrid();
+
+          } catch (error) {
+              console.error('❌ Erreur upload:', error);
+              this.app.showToast('❌ Erreur lors de l\'upload', 'error');
+          }
+      }
+
+      async showStatsPanel() {
+          try {
+              const stats = await this.app.procedureManager.getProcedureStats();
+              if (!stats) {
+                  this.app.showToast('❌ Impossible de charger les statistiques', 'error');
+                  return;
+              }
+
+              this.renderStats(stats);
+
+              const panel = document.getElementById('statsPanel');
+              if (panel) {
+                  panel.style.display = 'block';
+                  setTimeout(() => panel.classList.add('show'), 10);
+              }
+
+          } catch (error) {
+              console.error('❌ Erreur stats:', error);
+              this.app.showToast('❌ Erreur chargement statistiques', 'error');
+          }
+      }
+
+      hideStatsPanel() {
+          const panel = document.getElementById('statsPanel');
+          if (panel) {
+              panel.classList.remove('show');
+              setTimeout(() => panel.style.display = 'none', 300);
+          }
+      }
+
+      renderStats(stats) {
+          // Statistiques générales
+          document.getElementById('totalProcedures').textContent = stats.total;
+          document.getElementById('totalSize').textContent = this.formatFileSize(stats.totalSize);
+          document.getElementById('currentProcedures').textContent = stats.byStatus.current || 0;
+          document.getElementById('recentUpdates').textContent = stats.recentlyUpdated.length;
+
+          // Graphiques
+          this.renderChart('installationChart', stats.byInstallation);
+          this.renderChart('methodChart', stats.byMethod);
+      }
+
+      renderChart(containerId, data) {
+          const container = document.getElementById(containerId);
+          if (!container) return;
+
+          const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+
+          container.innerHTML = Object.entries(data).map(([key, value]) => {
+              const percentage = total > 0 ? (value / total) * 100 : 0;
+              return `
+                  <div class="chart-bar">
+                      <div class="chart-bar-label">${key}</div>
+                      <div class="chart-bar-visual">
+                          <div class="chart-bar-fill" style="width: ${percentage}%"></div>
+                      </div>
+                      <div class="chart-bar-value">${value}</div>
+                  </div>
+              `;
+          }).join('');
+      }
+
+      // Actions sur les procédures
+      async openProcedure(procedureId) {
+          this.app.showToast('📖 Ouverture de la procédure...', 'info');
+          // Simuler l'ouverture - aller vers checklist
+          setTimeout(() => {
+              this.app.switchSection('checklist');
+          }, 1000);
+      }
+
+      async downloadProcedure(procedureId) {
+          try {
+              await this.app.procedureManager.downloadProcedure(procedureId);
+              this.app.showToast('📥 Téléchargement démarré', 'success');
+              // Recharger pour mettre à jour le compteur de vues
+              setTimeout(() => this.loadProceduresGrid(), 1000);
+          } catch (error) {
+              this.app.showToast('❌ Erreur téléchargement', 'error');
+          }
+      }
+
+      showProcedureMenu(procedureId) {
+          // Menu contextuel pour plus d'options (à implémenter)
+          this.app.showToast('⋮ Menu procédure - À implémenter', 'info');
+      }
+
+      // Utilitaires
+      getStatusLabel(status) {
+          const labels = {
+              'current': 'Actuel',
+              'available': 'Disponible',
+              'update_available': 'MAJ dispo',
+              'obsolete': 'Obsolète'
+          };
+          return labels[status] || status;
+      }
+
+      formatFileSize(bytes) {
+          if (!bytes) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      formatDate(dateString) {
+          const date = new Date(dateString);
+          return date.toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+          });
+      }
+  }
 
 
 
