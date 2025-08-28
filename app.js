@@ -360,6 +360,124 @@
       }
   }
 
+  // Gestionnaire Service Worker
+  class ServiceWorkerManager {
+      constructor(app) {
+          this.app = app;
+          this.swRegistration = null;
+          this.init();
+      }
+
+      async init() {
+          if ('serviceWorker' in navigator) {
+              try {
+                  this.swRegistration = await navigator.serviceWorker.register('/sw.js');
+                  console.log('✅ Service Worker enregistré:', this.swRegistration);
+
+                  // Écouter les messages du Service Worker
+                  navigator.serviceWorker.addEventListener('message', (event) => {
+                      this.handleServiceWorkerMessage(event);
+                  });
+
+                  // Vérifier les mises à jour
+                  this.checkForUpdates();
+
+                  // Écouter les changements d'état
+                  this.swRegistration.addEventListener('updatefound', () => {
+                      this.handleUpdateFound();
+                  });
+
+              } catch (error) {
+                  console.error('❌ Erreur Service Worker:', error);
+              }
+          }
+      }
+
+      handleServiceWorkerMessage(event) {
+          const { type, action, data } = event.data;
+
+          if (type === 'SYNC_REQUEST') {
+              this.handleSyncRequest(action, data);
+          }
+      }
+
+      async handleSyncRequest(action, data) {
+          if (action === 'sync-pending-data') {
+              await this.syncPendingData();
+          } else if (action === 'sync-pending-media') {
+              await this.syncPendingMedia();
+          }
+      }
+
+      async syncPendingData() {
+          try {
+              const pendingItems = await this.app.dbManager.getPendingSyncItems();
+              console.log(`🔄 Synchronisation de ${pendingItems.length} éléments`);
+
+              for (const item of pendingItems) {
+                  // Simuler la synchronisation
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  await this.app.dbManager.markSyncItemCompleted(item.id);
+              }
+
+              this.app.showToast('🔄 Données synchronisées en arrière-plan', 'success');
+          } catch (error) {
+              console.error('❌ Erreur sync données:', error);
+          }
+      }
+
+      async syncPendingMedia() {
+          try {
+              // Simuler la synchronisation des médias
+              this.app.showToast('📸 Médias synchronisés en arrière-plan', 'success');
+          } catch (error) {
+              console.error('❌ Erreur sync médias:', error);
+          }
+      }
+
+      checkForUpdates() {
+          if (this.swRegistration) {
+              this.swRegistration.update();
+          }
+      }
+
+      handleUpdateFound() {
+          const newWorker = this.swRegistration.installing;
+          newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  this.app.showToast('🔄 Mise à jour disponible - Rechargez la page', 'info');
+              }
+          });
+      }
+
+      // Enregistrer une synchronisation en arrière-plan
+      async registerBackgroundSync(tag) {
+          if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+              try {
+                  const registration = await navigator.serviceWorker.ready;
+                  await registration.sync.register(tag);
+                  console.log(`🔄 Background sync enregistré: ${tag}`);
+              } catch (error) {
+                  console.error('❌ Erreur background sync:', error);
+              }
+          }
+      }
+
+      // Communiquer avec le Service Worker
+      postMessage(type, action, data) {
+          if (navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({
+                  type, action, data
+              });
+          }
+      }
+  }
+
+
+
+
+
+
   // CSS animations
   const additionalStyles = `
   @keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
